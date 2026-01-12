@@ -1,0 +1,9 @@
+FastAPI
+Uvicorn
+SQLAlchemy
+aiomysql
+qrcode
+Pillow
+fastapi-mail
+python-dotenv
+python-multipart

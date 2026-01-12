@@ -1,0 +1,81 @@
+# =============================================================================
+# LAMITIE 2025 - GIT IGNORE FILE
+# =============================================================================
+
+# Environment Variables - NEVER commit secrets!
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Alembic
+alembic/versions/*.pyc
+
+# OS specific
+Thumbs.db
+.DS_Store
+
+# FastAPI/Uvicorn
+*.pid
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Node.js (if adding frontend later)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Production
+*.pem
+*.key
+*.crt

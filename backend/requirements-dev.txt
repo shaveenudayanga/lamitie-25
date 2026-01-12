@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+aiomysql
+qrcode
+Pillow
+fastapi-mail
+python-dotenv
+python-multipart
+pytest
+httpx
+mypy
+black
+isort
+flake8
