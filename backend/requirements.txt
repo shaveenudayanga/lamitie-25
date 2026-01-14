@@ -7,3 +7,4 @@ Pillow
 fastapi-mail
 python-dotenv
 python-multipart
+pydantic-settings
