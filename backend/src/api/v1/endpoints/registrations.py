@@ -6,7 +6,7 @@ from src.api.deps import get_db
 
 router = APIRouter()
 
-@router.post("/registrations/", response_model=RegistrationResponse)
+@router.post("/", response_model=RegistrationResponse)
 async def create_registration(
     registration: RegistrationCreate,
     db: Session = Depends(get_db)
