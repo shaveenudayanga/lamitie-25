@@ -60,10 +60,47 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Create deployment directory on server
+      - name: Setup swap on server (if not exists)
         run: |
           ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
-            mkdir -p ${{ env.APP_DIR }}
+            # Create swap if not exists
+            if ! swapon --show | grep -q '/swapfile'; then
+              if [ ! -f /swapfile ]; then
+                echo "Creating 2GB swapfile..."
+                sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+                sudo chmod 600 /swapfile
+                sudo mkswap /swapfile
+              fi
+              sudo swapon /swapfile
+              if ! grep -q '/swapfile' /etc/fstab; then
+                echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+              fi
+              sudo sysctl -w vm.swappiness=10
+              if ! grep -q '^vm.swappiness' /etc/sysctl.conf; then
+                echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+              fi
+            fi
+            echo "Swap status:"
+            free -h
+            sudo swapon --show
+          EOF
+
+      - name: Install server dependencies
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
+            # Install Python, pip, venv, nginx if not present
+            if ! command -v python3 &> /dev/null || ! command -v nginx &> /dev/null; then
+              echo "Installing system dependencies..."
+              sudo apt-get update
+              sudo apt-get install -y python3 python3-pip python3-venv nginx
+            fi
+            python3 --version
+            nginx -v
+          EOF
+
+      - name: Create deployment directories
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
             mkdir -p ${{ env.APP_DIR }}/backend
             mkdir -p ${{ env.APP_DIR }}/frontend/dist
           EOF
@@ -75,6 +112,7 @@ jobs:
             --exclude '*.pyc' \
             --exclude '.pytest_cache' \
             --exclude 'venv' \
+            --exclude '.venv' \
             --exclude '.env' \
             backend/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.APP_DIR }}/backend/
 
@@ -83,36 +121,74 @@ jobs:
           rsync -avz --delete \
             frontend/dist/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.APP_DIR }}/frontend/dist/
 
-      - name: Deploy Docker Compose and Start Services
+      - name: Deploy systemd and nginx configs
+        run: |
+          rsync -avz deploy/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.APP_DIR }}/deploy/
+
+      - name: Setup Python virtual environment and install dependencies
         run: |
           ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
             cd ${{ env.APP_DIR }}/backend
             
-            # Stop existing containers
-            docker-compose down || true
+            # Create virtual environment if not exists
+            if [ ! -d ".venv" ]; then
+              echo "Creating Python virtual environment..."
+              python3 -m venv .venv
+            fi
             
-            # Build and start containers
-            docker-compose up -d --build
+            # Activate and install dependencies
+            source .venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
             
-            # Show running containers
-            docker-compose ps
+            echo "Python environment ready"
+            python --version
+            pip list | head -20
+          EOF
+
+      - name: Configure and start services
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
+            # Deploy systemd service
+            sudo cp ${{ env.APP_DIR }}/deploy/systemd/lamitie.service /etc/systemd/system/lamitie.service
+            sudo systemctl daemon-reload
+            sudo systemctl enable lamitie
+            sudo systemctl restart lamitie
             
-            # Clean up old images
-            docker image prune -f
+            # Deploy nginx config
+            sudo cp ${{ env.APP_DIR }}/deploy/nginx/lamitie.conf /etc/nginx/sites-available/lamitie
+            sudo ln -sf /etc/nginx/sites-available/lamitie /etc/nginx/sites-enabled/lamitie
+            sudo rm -f /etc/nginx/sites-enabled/default
+            
+            # Test and reload nginx
+            sudo nginx -t
+            sudo systemctl reload nginx
+            
+            echo "Services configured and started"
           EOF
 
       - name: Health Check
         run: |
-          sleep 10
+          sleep 5
           ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
-            cd ${{ env.APP_DIR }}/backend
-            docker-compose ps
-            echo "Checking backend health..."
-            curl -f http://localhost:8000/docs || echo "Backend might still be starting up..."
+            echo "=== Service Status ==="
+            sudo systemctl status lamitie --no-pager || true
+            sudo systemctl status nginx --no-pager || true
+            
+            echo ""
+            echo "=== Memory Usage ==="
+            free -h
+            
+            echo ""
+            echo "=== Health Check ==="
+            curl -s -o /dev/null -w "Backend API: HTTP %{http_code}\n" http://localhost:8000/docs || echo "Backend not responding yet"
+            curl -s -o /dev/null -w "Frontend (nginx): HTTP %{http_code}\n" http://localhost/ || echo "Frontend not responding yet"
           EOF
 
       - name: Deployment Summary
         run: |
           echo "✅ Deployment completed successfully!"
-          echo "📦 Backend deployed to: ${{ env.SERVER_IP }}:8000"
-          echo "🌐 Frontend build deployed to: ${{ env.APP_DIR }}/frontend/dist"
+          echo "🌐 Application URL: http://${{ env.SERVER_IP }}"
+          echo "📖 API Docs: http://${{ env.SERVER_IP }}/docs"
+          echo "📦 Backend: systemd service 'lamitie'"
+          echo "🖥️ Frontend: nginx serving static files"

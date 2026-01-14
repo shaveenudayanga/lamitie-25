@@ -3,11 +3,11 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from src.db.session import get_db
-from src.config.settings import DATABASE_URL
+from src.config.settings import settings
 
 @pytest.fixture(scope="session")
 def db_session():
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(settings.db_url)
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = TestingSessionLocal()
     yield session
