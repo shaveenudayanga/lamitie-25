@@ -214,8 +214,8 @@ def generate_qr_code_bytes(data: str) -> bytes:
 
 def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     """
-    Get decorative serif font suitable for Lord of the Rings theme.
-    Prioritizes elegant, medieval-style system fonts.
+    Get decorative script/calligraphy font suitable for Lord of the Rings theme.
+    Prioritizes decorative, cursive, and ornamental system fonts.
     
     Args:
         size: Font size in pixels
@@ -224,27 +224,33 @@ def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     Returns:
         ImageFont: The loaded font
     """
-    # List of elegant serif fonts (in order of preference)
+    # List of decorative/script fonts (in order of preference)
     font_candidates = [
-        # Linux - Elegant serif fonts
-        "/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf",
+        # Linux - Decorative fonts
+        "/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf",
+        "/usr/share/fonts/truetype/uralic/Tharlon-Regular.ttf",
+        "/usr/share/fonts/truetype/ubuntu/Ubuntu-CondensedItalic.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-BoldOblique.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Oblique.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
-        "/usr/share/fonts/truetype/linux-libertine/LinLibertine_RB.ttf" if bold else "/usr/share/fonts/truetype/linux-libertine/LinLibertine_R.ttf",
-        "/usr/share/fonts/truetype/freefont/FreeSerifBoldItalic.ttf" if bold else "/usr/share/fonts/truetype/freefont/FreeSerifItalic.ttf",
-        # macOS - Elegant fonts
-        "/System/Library/Fonts/Supplemental/Palatino.ttc",
-        "/System/Library/Fonts/Supplemental/Baskerville.ttc",
-        "/Library/Fonts/Baskerville Bold Italic.ttf" if bold else "/Library/Fonts/Baskerville Italic.ttf",
-        "/System/Library/Fonts/Times.ttc",
-        "/Library/Fonts/Georgia Bold Italic.ttf" if bold else "/Library/Fonts/Georgia Italic.ttf",
-        # Windows - Elegant fonts
-        "C:/Windows/Fonts/palatibi.ttf" if bold else "C:/Windows/Fonts/palatii.ttf",  # Palatino Linotype Italic
-        "C:/Windows/Fonts/BASKVILL.TTF",  # Baskerville Old Face
-        "C:/Windows/Fonts/ITCBLKAD.TTF",  # Blackadder ITC (very medieval)
-        "C:/Windows/Fonts/georgiaz.ttf" if bold else "C:/Windows/Fonts/georgiai.ttf",  # Georgia Italic
-        "C:/Windows/Fonts/timesbi.ttf" if bold else "C:/Windows/Fonts/timesi.ttf",  # Times Italic
+        # macOS - Script and decorative fonts
+        "/System/Library/Fonts/Supplemental/Zapfino.ttf",  # Highly decorative script
+        "/System/Library/Fonts/Supplemental/Snell Roundhand.ttc",  # Elegant script
+        "/System/Library/Fonts/Supplemental/Bradley Hand Bold.ttf",  # Handwritten style
+        "/System/Library/Fonts/Supplemental/Brush Script.ttf",  # Brush script
+        "/System/Library/Fonts/Supplemental/Apple Chancery.ttf",  # Medieval style
+        "/System/Library/Fonts/Supplemental/Papyrus.ttc",  # Ancient style
+        "/System/Library/Fonts/Supplemental/Copperplate.ttc",  # Elegant engraved
+        # Windows - Script and decorative fonts
+        "C:/Windows/Fonts/MTCORSVA.TTF",  # Monotype Corsiva (elegant script)
+        "C:/Windows/Fonts/BRUSHSCI.TTF",  # Brush Script MT
+        "C:/Windows/Fonts/ITCBLKAD.TTF",  # Blackadder ITC (medieval)
+        "C:/Windows/Fonts/BRADHITC.TTF",  # Bradley Hand ITC
+        "C:/Windows/Fonts/FREESCPT.TTF",  # Freestyle Script
+        "C:/Windows/Fonts/FRSCRIPT.TTF",  # French Script MT
+        "C:/Windows/Fonts/KUNSTLER.TTF",  # Kunstler Script
+        "C:/Windows/Fonts/VIVALDII.TTF",  # Vivaldi (italic script)
+        "C:/Windows/Fonts/MISTRAL.TTF",  # Mistral
+        "C:/Windows/Fonts/PAPYRUS.TTF",  # Papyrus
     ]
     
     for font_path in font_candidates:
@@ -254,17 +260,17 @@ def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
             except Exception:
                 continue
     
-    # Fallback to default font
+    # Fallback to italic serif
     try:
-        return ImageFont.truetype("LiberationSerif-Regular.ttf", size)
+        return ImageFont.truetype("DejaVuSerif-Italic.ttf", size)
     except Exception:
         return ImageFont.load_default()
 
 
 def get_standard_serif_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     """
-    Get an elegant decorative font for dividers and special elements.
-    Uses italic or ornamental fonts for a more fantasy feel.
+    Get a decorative ornamental font for dividers and special elements.
+    Uses script/decorative fonts for a more fantasy feel.
     
     Args:
         size: Font size in pixels
@@ -274,21 +280,22 @@ def get_standard_serif_font(size: int, bold: bool = False) -> ImageFont.FreeType
         ImageFont: The loaded decorative font
     """
     font_candidates = [
-        # Linux - Decorative fonts with good symbol support
-        "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf",
-        "/usr/share/fonts/truetype/linux-libertine/LinLibertine_RI.ttf",
+        # Linux - Ornamental fonts
+        "/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-ExtraLight.ttf",
         "/usr/share/fonts/truetype/ubuntu/Ubuntu-LightItalic.ttf",
-        # macOS fonts
-        "/System/Library/Fonts/Supplemental/Palatino.ttc",
-        "/System/Library/Fonts/Supplemental/Didot.ttc",
-        "/Library/Fonts/Baskerville Italic.ttf",
-        "/System/Library/Fonts/Times.ttc",
-        # Windows fonts
-        "C:/Windows/Fonts/palatii.ttf",  # Palatino Linotype Italic
-        "C:/Windows/Fonts/BRADHITC.TTF",  # Bradley Hand ITC
-        "C:/Windows/Fonts/georgiai.ttf",  # Georgia Italic
-        "C:/Windows/Fonts/timesi.ttf",  # Times Italic
+        # macOS - Decorative fonts
+        "/System/Library/Fonts/Supplemental/Copperplate.ttc",  # Engraved style
+        "/System/Library/Fonts/Supplemental/Zapfino.ttf",  # Highly decorative
+        "/System/Library/Fonts/Supplemental/Snell Roundhand.ttc",
+        "/System/Library/Fonts/Supplemental/Apple Chancery.ttf",
+        "/System/Library/Fonts/Supplemental/Papyrus.ttc",
+        # Windows - Ornamental fonts
+        "C:/Windows/Fonts/COPRGTB.TTF",  # Copperplate Gothic Bold
+        "C:/Windows/Fonts/MTCORSVA.TTF",  # Monotype Corsiva
+        "C:/Windows/Fonts/KUNSTLER.TTF",  # Kunstler Script
+        "C:/Windows/Fonts/PAPYRUS.TTF",  # Papyrus
+        "C:/Windows/Fonts/MISTRAL.TTF",  # Mistral
     ]
     
     for font_path in font_candidates:
@@ -300,7 +307,7 @@ def get_standard_serif_font(size: int, bold: bool = False) -> ImageFont.FreeType
     
     # Fallback to default font
     try:
-        return ImageFont.truetype("LiberationSerif-Italic.ttf", size)
+        return ImageFont.truetype("DejaVuSans-ExtraLight.ttf", size)
     except Exception:
         return ImageFont.load_default()
 
