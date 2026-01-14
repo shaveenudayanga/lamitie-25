@@ -48,7 +48,7 @@ FOREST_GREEN = "#1a2f1a"           # Alternative dark background
 # Light colors for dark backgrounds
 LIGHT_TEXT = "#E0D8C3"             # Light cream/parchment text for dark backgrounds
 LIGHT_ACCENT = "#D4A574"           # Light brown/gold accent for dark backgrounds
-QR_LIGHT_COLOR = "#8B6B4A"         # Brownish color for QR code on dark background
+QR_LIGHT_COLOR = "#B8956F"         # Lighter brownish color for QR code on dark background
 
 # Asset paths
 ASSETS_DIR = Path(__file__).parent / "assets"
@@ -214,7 +214,8 @@ def generate_qr_code_bytes(data: str) -> bytes:
 
 def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     """
-    Get DejaVu Serif font for the PDF attachment.
+    Get decorative serif font suitable for Lord of the Rings theme.
+    Prioritizes elegant, medieval-style system fonts.
     
     Args:
         size: Font size in pixels
@@ -223,22 +224,27 @@ def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     Returns:
         ImageFont: The loaded font
     """
-    # List of DejaVu Serif fonts to try (in order of preference)
+    # List of elegant serif fonts (in order of preference)
     font_candidates = [
-        # DejaVu Serif (priority)
-        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
-        # Alternative paths
-        "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf",
-        # Fallback to Liberation Serif
+        # Linux - Elegant serif fonts
+        "/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf",
-        # macOS fonts
+        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        "/usr/share/fonts/truetype/linux-libertine/LinLibertine_RB.ttf" if bold else "/usr/share/fonts/truetype/linux-libertine/LinLibertine_R.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSerifBoldItalic.ttf" if bold else "/usr/share/fonts/truetype/freefont/FreeSerifItalic.ttf",
+        # macOS - Elegant fonts
+        "/System/Library/Fonts/Supplemental/Palatino.ttc",
+        "/System/Library/Fonts/Supplemental/Baskerville.ttc",
+        "/Library/Fonts/Baskerville Bold Italic.ttf" if bold else "/Library/Fonts/Baskerville Italic.ttf",
         "/System/Library/Fonts/Times.ttc",
-        "/Library/Fonts/Times New Roman Bold.ttf" if bold else "/Library/Fonts/Times New Roman.ttf",
-        # Windows fonts
-        "C:/Windows/Fonts/timesbd.ttf" if bold else "C:/Windows/Fonts/times.ttf",
-        "C:/Windows/Fonts/times.ttf",
+        "/Library/Fonts/Georgia Bold Italic.ttf" if bold else "/Library/Fonts/Georgia Italic.ttf",
+        # Windows - Elegant fonts
+        "C:/Windows/Fonts/palatibi.ttf" if bold else "C:/Windows/Fonts/palatii.ttf",  # Palatino Linotype Italic
+        "C:/Windows/Fonts/BASKVILL.TTF",  # Baskerville Old Face
+        "C:/Windows/Fonts/ITCBLKAD.TTF",  # Blackadder ITC (very medieval)
+        "C:/Windows/Fonts/georgiaz.ttf" if bold else "C:/Windows/Fonts/georgiai.ttf",  # Georgia Italic
+        "C:/Windows/Fonts/timesbi.ttf" if bold else "C:/Windows/Fonts/timesi.ttf",  # Times Italic
     ]
     
     for font_path in font_candidates:
@@ -250,34 +256,39 @@ def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     
     # Fallback to default font
     try:
-        return ImageFont.truetype("DejaVuSerif.ttf", size)
+        return ImageFont.truetype("LiberationSerif-Regular.ttf", size)
     except Exception:
         return ImageFont.load_default()
 
 
 def get_standard_serif_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     """
-    Get a standard serif font (bypasses LOTR fonts) for decorative elements.
-    Uses only system serif fonts for cleaner rendering of symbols.
+    Get an elegant decorative font for dividers and special elements.
+    Uses italic or ornamental fonts for a more fantasy feel.
     
     Args:
         size: Font size in pixels
         bold: Whether to use bold variant
         
     Returns:
-        ImageFont: The loaded system serif font
+        ImageFont: The loaded decorative font
     """
     font_candidates = [
-        # Linux system fonts (serif)
-        "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
-        "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf" if bold else "/usr/share/fonts/truetype/freefont/FreeSerif.ttf",
+        # Linux - Decorative fonts with good symbol support
+        "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf",
+        "/usr/share/fonts/truetype/linux-libertine/LinLibertine_RI.ttf",
+        "/usr/share/fonts/truetype/ubuntu/Ubuntu-LightItalic.ttf",
         # macOS fonts
+        "/System/Library/Fonts/Supplemental/Palatino.ttc",
+        "/System/Library/Fonts/Supplemental/Didot.ttc",
+        "/Library/Fonts/Baskerville Italic.ttf",
         "/System/Library/Fonts/Times.ttc",
-        "/Library/Fonts/Times New Roman Bold.ttf" if bold else "/Library/Fonts/Times New Roman.ttf",
         # Windows fonts
-        "C:/Windows/Fonts/timesbd.ttf" if bold else "C:/Windows/Fonts/times.ttf",
-        "C:/Windows/Fonts/georgiab.ttf" if bold else "C:/Windows/Fonts/georgia.ttf",
+        "C:/Windows/Fonts/palatii.ttf",  # Palatino Linotype Italic
+        "C:/Windows/Fonts/BRADHITC.TTF",  # Bradley Hand ITC
+        "C:/Windows/Fonts/georgiai.ttf",  # Georgia Italic
+        "C:/Windows/Fonts/timesi.ttf",  # Times Italic
     ]
     
     for font_path in font_candidates:
@@ -289,7 +300,7 @@ def get_standard_serif_font(size: int, bold: bool = False) -> ImageFont.FreeType
     
     # Fallback to default font
     try:
-        return ImageFont.truetype("DejaVuSerif.ttf", size)
+        return ImageFont.truetype("LiberationSerif-Italic.ttf", size)
     except Exception:
         return ImageFont.load_default()
 
@@ -357,10 +368,10 @@ def generate_ticket_pdf(
     page1 = background1.copy().convert("RGB")
     draw1 = ImageDraw.Draw(page1)
     
-    # Starting Y position (after logo area)
-    current_y = int(page_height * 0.30)
+    # Starting Y position (after logo area - moved lower to avoid clash)
+    current_y = int(page_height * 0.32)
     
-    # Student Name with "Dear"
+    # Student Name with Dear
     display_name = f"Dear {student_name.title()}"
     draw1.text(
         (center_x, current_y),
@@ -369,7 +380,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 130
+    current_y += 125
     
     # "We are delighted to invite you to"
     draw1.text(
@@ -379,53 +390,161 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 85
+    current_y += 80
     
-    # "L'AMITIÉ 2K25" in gold accent
+    # "LAMITIE 2K25" in light accent
     draw1.text(
         (center_x, current_y),
-        "L'AMITIÉ 2K25",
+        "L'AMITIÉ 2K25,",
         font=font_title,
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 100
+    current_y += 85
     
-    # Event details
+    # "An evening of excitement, entertainment and connection!"
     draw1.text(
         (center_x, current_y),
-        f"Date: {event_date}",
-        font=font_body,
+        "An evening of excitement, entertainment and",
+        font=font_body_small,
         fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 70
+    draw1.text(
+        (center_x, current_y),
+        "connection!",
+        font=font_body_small,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 95
+    
+    # Decorative divider
+    draw1.text(
+        (center_x, current_y),
+        "═══ ◆ ═══",
+        font=font_divider,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 75
+    
+    # "DATE:"
+    draw1.text(
+        (center_x, current_y),
+        "Date:",
+        font=font_label,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 75
+    
+    # Event Date in light accent
+    draw1.text(
+        (center_x, current_y),
+        event_date,
+        font=font_event_detail,
+        fill=LIGHT_ACCENT,
         anchor="mm"
     )
     current_y += 85
     
+    # "TIME:"
     draw1.text(
         (center_x, current_y),
-        f"Time: {event_time}",
-        font=font_body,
+        "Time:",
+        font=font_label,
         fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 75
+    
+    # Event Time in light accent
+    draw1.text(
+        (center_x, current_y),
+        event_time,
+        font=font_event_detail,
+        fill=LIGHT_ACCENT,
         anchor="mm"
     )
     current_y += 85
     
+    # "VENUE:"
     draw1.text(
         (center_x, current_y),
-        f"Venue: {event_venue}",
-        font=font_body,
+        "Venue:",
+        font=font_label,
         fill=LIGHT_TEXT,
         anchor="mm"
     )
+    current_y += 75
+    
+    # Venue name in light accent (large)
+    draw1.text(
+        (center_x, current_y),
+        event_venue,
+        font=font_venue,
+        fill=LIGHT_ACCENT,
+        anchor="mm"
+    )
+    current_y += 85
+    
+    # Venue sub-location
     if event_venue_sub:
-        current_y += 70
         draw1.text(
             (center_x, current_y),
             event_venue_sub,
-            font=font_body_small,
-            fill=LIGHT_TEXT,
+            font=font_venue_sub,
+            fill=LIGHT_ACCENT,
             anchor="mm"
         )
+        current_y += 85
+    else:
+        current_y += 45
+    
+    # Decorative divider
+    draw1.text(
+        (center_x, current_y),
+        "═══ ◆ ═══",
+        font=font_divider,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 95
+    
+    # Important notice
+    draw1.text(
+        (center_x, current_y),
+        "Don't forget to bring this invitation",
+        font=font_body_small,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 70
+    draw1.text(
+        (center_x, current_y),
+        "with you!",
+        font=font_body_small,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 75
+    draw1.text(
+        (center_x, current_y),
+        "IT'S YOUR ENTRY PASS",
+        font=font_body,
+        fill=LIGHT_ACCENT,
+        anchor="mm"
+    )
+    current_y += 75
+    draw1.text(
+        (center_x, current_y),
+        "to the event!",
+        font=font_body_small,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
     
     # =========================================================================
     # PAGE 2: QR Code Page with invitation_2.png background (light colors)
