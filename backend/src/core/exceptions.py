@@ -3,6 +3,11 @@ class NotFoundException(Exception):
         self.detail = detail
 
 
+class UserNotFoundException(NotFoundException):
+    """Exception raised when a user is not found."""
+    pass
+
+
 class ConflictException(Exception):
     def __init__(self, detail: str):
         self.detail = detail
