@@ -7,7 +7,8 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    index_number = Column(String, unique=True, index=True)
-    email = Column(String, unique=True, index=True)
+    name = Column(String(255), index=True)
+    index_number = Column(String(50), unique=True, index=True)
+    email = Column(String(255), unique=True, index=True)
+    combination = Column(String(100), nullable=True)
     attendance_status = Column(Boolean, default=False)

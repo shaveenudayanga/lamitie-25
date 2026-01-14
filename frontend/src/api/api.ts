@@ -8,7 +8,7 @@ const API = axios.create({
 export const welcome = () => API.get("/");
 
 // REGISTRATION
-export const registerStudent = (data: any) => API.post("/registrations/", data);
+export const registerStudent = (data: any) => API.post("/users/register/", data);
 
 // ATTENDANCE
 export const scanAttendance = (data: any) => API.post("/registrations/scan/", data);
