@@ -8,11 +8,11 @@ const API = axios.create({
 export const welcome = () => API.get("/");
 
 // REGISTRATION
-export const registerStudent = (data: any) => API.post("/registrations", data);
+export const registerStudent = (data: any) => API.post("/registrations/", data);
 
 // ATTENDANCE
-export const scanAttendance = (data: any) => API.post("/registrations/scan", data);
+export const scanAttendance = (data: any) => API.post("/registrations/scan/", data);
 
 // ADMIN
-export const getStudents = () => API.get("/users");
-export const getStudent = (index: any) => API.get(`/users/${index}`);
+export const getStudents = () => API.get("/users/");
+export const getStudent = (index: any) => API.get(`/users/${index}/`);
