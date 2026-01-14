@@ -1,0 +1,118 @@
+name: Deploy to Azure Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  SERVER_IP: 20.120.179.111
+  SERVER_USER: gamesploit
+  APP_DIR: /home/gamesploit/lamitie-25
+
+jobs:
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
+          retention-days: 1
+
+  deploy:
+    name: Deploy to Azure Server
+    runs-on: ubuntu-latest
+    needs: build-frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download frontend build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment directory on server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
+            mkdir -p ${{ env.APP_DIR }}
+            mkdir -p ${{ env.APP_DIR }}/backend
+            mkdir -p ${{ env.APP_DIR }}/frontend/dist
+          EOF
+
+      - name: Deploy Backend
+        run: |
+          rsync -avz --delete \
+            --exclude '__pycache__' \
+            --exclude '*.pyc' \
+            --exclude '.pytest_cache' \
+            --exclude 'venv' \
+            --exclude '.env' \
+            backend/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.APP_DIR }}/backend/
+
+      - name: Deploy Frontend Build
+        run: |
+          rsync -avz --delete \
+            frontend/dist/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.APP_DIR }}/frontend/dist/
+
+      - name: Deploy Docker Compose and Start Services
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
+            cd ${{ env.APP_DIR }}/backend
+            
+            # Stop existing containers
+            docker-compose down || true
+            
+            # Build and start containers
+            docker-compose up -d --build
+            
+            # Show running containers
+            docker-compose ps
+            
+            # Clean up old images
+            docker image prune -f
+          EOF
+
+      - name: Health Check
+        run: |
+          sleep 10
+          ssh -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} << 'EOF'
+            cd ${{ env.APP_DIR }}/backend
+            docker-compose ps
+            echo "Checking backend health..."
+            curl -f http://localhost:8000/docs || echo "Backend might still be starting up..."
+          EOF
+
+      - name: Deployment Summary
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "📦 Backend deployed to: ${{ env.SERVER_IP }}:8000"
+          echo "🌐 Frontend build deployed to: ${{ env.APP_DIR }}/frontend/dist"
