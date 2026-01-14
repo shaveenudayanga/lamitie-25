@@ -1,0 +1,15 @@
+[Unit]
+Description=Lamitie FastAPI Backend
+After=network.target
+
+[Service]
+User=gamesploit
+Group=gamesploit
+WorkingDirectory=/home/gamesploit/lamitie-25/backend
+Environment="PATH=/home/gamesploit/lamitie-25/backend/.venv/bin"
+ExecStart=/home/gamesploit/lamitie-25/backend/.venv/bin/uvicorn src.main:app --host 127.0.0.1 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
