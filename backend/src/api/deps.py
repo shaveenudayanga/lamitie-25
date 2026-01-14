@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status
 from src.db.session import get_db
 from src.models.user import User
-from src.core.exceptions import UserNotFoundException
 
 def get_user(user_id: int, db: Session = Depends(get_db)) -> User:
     user = db.query(User).filter(User.id == user_id).first()
