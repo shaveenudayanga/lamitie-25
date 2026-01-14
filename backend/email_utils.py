@@ -47,7 +47,8 @@ FOREST_GREEN = "#1a2f1a"           # Alternative dark background
 
 # Asset paths
 ASSETS_DIR = Path(__file__).parent / "assets"
-INVITATION_IMAGE_PATH = ASSETS_DIR / "invitation.png"
+INVITATION_PAGE1_PATH = ASSETS_DIR / "invitation_1.png"
+INVITATION_PAGE2_PATH = ASSETS_DIR / "invitation_2.png"
 
 # Event Details (Constants)
 EVENT_DATE = "25th January 2026"
@@ -291,7 +292,6 @@ def get_standard_serif_font(size: int, bold: bool = False) -> ImageFont.FreeType
 def generate_ticket_pdf(
     student_name: str,
     index_number: str,
-    invitation_image_path: str | Path = None,
     event_date: str = EVENT_DATE,
     event_time: str = EVENT_TIME,
     event_venue: str = EVENT_VENUE,
@@ -300,13 +300,12 @@ def generate_ticket_pdf(
     """
     Generate a 2-page PDF ticket for L'amitié 2k25.
     
-    Page 1: Personalized invitation with event details overlaid on parchment
-    Page 2: QR code page with name and index number on parchment
+    Page 1: invitation_1.png as background
+    Page 2: invitation_2.png with QR code overlaid
     
     Args:
         student_name: The student's full name
         index_number: The student's index number (encoded in QR)
-        invitation_image_path: Path to the parchment background image
         event_date: Event date string (e.g., "01st February 2025")
         event_time: Event time string (e.g., "3.00 P.M")
         event_venue: Main venue name (e.g., "Willuda Inn")
@@ -315,21 +314,21 @@ def generate_ticket_pdf(
     Returns:
         bytes: PDF file as bytes (ready for email attachment)
     """
-    # Use default path if not provided
-    if invitation_image_path is None:
-        invitation_image_path = INVITATION_IMAGE_PATH
-    
-    invitation_image_path = Path(invitation_image_path)
-    
-    # Load the parchment background image
-    if invitation_image_path.exists():
-        background = Image.open(invitation_image_path).convert("RGBA")
+    # Load background images for each page
+    if INVITATION_PAGE1_PATH.exists():
+        background1 = Image.open(INVITATION_PAGE1_PATH).convert("RGBA")
     else:
         # Create a fallback parchment if image not found
-        background = Image.new("RGBA", (595, 842), (*PARCHMENT_COLOR, 255))
+        background1 = Image.new("RGBA", (595, 842), (*PARCHMENT_COLOR, 255))
+    
+    if INVITATION_PAGE2_PATH.exists():
+        background2 = Image.open(INVITATION_PAGE2_PATH).convert("RGBA")
+    else:
+        # Create a fallback parchment if image not found
+        background2 = Image.new("RGBA", (595, 842), (*PARCHMENT_COLOR, 255))
     
     # Get dimensions from background
-    page_width, page_height = background.size
+    page_width, page_height = background1.size
     center_x = page_width // 2
     
     # Load fonts at various sizes (2x increase for better readability)
@@ -347,198 +346,19 @@ def generate_ticket_pdf(
     font_divider = get_standard_serif_font(52)
     
     # =========================================================================
-    # PAGE 1: Personalized Invitation
+    # PAGE 1: Use invitation_1.png as-is (no text overlay)
     # =========================================================================
     
-    page1 = background.copy().convert("RGB")
-    draw1 = ImageDraw.Draw(page1)
-    
-    # Starting Y position (after logo area - moved lower to avoid clash)
-    current_y = int(page_height * 0.32)
-    
-    # Student Name with Dear
-    display_name = f"Dear {student_name.title()}"
-    draw1.text(
-        (center_x, current_y),
-        display_name,
-        font=font_name,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 125
-    
-    # "We are delighted to invite you to"
-    draw1.text(
-        (center_x, current_y),
-        "We are delighted to invite you to",
-        font=font_body_small,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 80
-    
-    # "LAMITIE 2K25" in burgundy
-    draw1.text(
-        (center_x, current_y),
-        "L'AMITIÉ 2K25,",
-        font=font_title,
-        fill=BURGUNDY_ACCENT,
-        anchor="mm"
-    )
-    current_y += 85
-    
-    # "An evening of excitement, entertainment and connection!"
-    draw1.text(
-        (center_x, current_y),
-        "An evening of excitement, entertainment and",
-        font=font_body_small,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 70
-    draw1.text(
-        (center_x, current_y),
-        "connection!",
-        font=font_body_small,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 95
-    
-    # Decorative divider
-    draw1.text(
-        (center_x, current_y),
-        "═══ ◆ ═══",
-        font=font_divider,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 75
-    
-    # "DATE:"
-    draw1.text(
-        (center_x, current_y),
-        "Date:",
-        font=font_label,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 75
-    
-    # Event Date in burgundy
-    draw1.text(
-        (center_x, current_y),
-        event_date,
-        font=font_event_detail,
-        fill=BURGUNDY_ACCENT,
-        anchor="mm"
-    )
-    current_y += 85
-    
-    # "TIME:"
-    draw1.text(
-        (center_x, current_y),
-        "Time:",
-        font=font_label,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 75
-    
-    # Event Time in burgundy
-    draw1.text(
-        (center_x, current_y),
-        event_time,
-        font=font_event_detail,
-        fill=BURGUNDY_ACCENT,
-        anchor="mm"
-    )
-    current_y += 85
-    
-    # "VENUE:"
-    draw1.text(
-        (center_x, current_y),
-        "Venue:",
-        font=font_label,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 75
-    
-    # Venue name in burgundy (large)
-    draw1.text(
-        (center_x, current_y),
-        event_venue,
-        font=font_venue,
-        fill=BURGUNDY_ACCENT,
-        anchor="mm"
-    )
-    current_y += 85
-    
-    # Venue sub-location
-    if event_venue_sub:
-        draw1.text(
-            (center_x, current_y),
-            event_venue_sub,
-            font=font_venue_sub,
-            fill=BURGUNDY_ACCENT,
-            anchor="mm"
-        )
-        current_y += 85
-    else:
-        current_y += 45
-    
-    # Decorative divider
-    draw1.text(
-        (center_x, current_y),
-        "═══ ◆ ═══",
-        font=font_divider,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 95
-    
-    # Important notice
-    draw1.text(
-        (center_x, current_y),
-        "Don't forget to bring this invitation",
-        font=font_body_small,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 70
-    draw1.text(
-        (center_x, current_y),
-        "with you!",
-        font=font_body_small,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
-    current_y += 75
-    draw1.text(
-        (center_x, current_y),
-        "IT'S YOUR ENTRY PASS",
-        font=font_body,
-        fill=BURGUNDY_ACCENT,
-        anchor="mm"
-    )
-    current_y += 75
-    draw1.text(
-        (center_x, current_y),
-        "to the event!",
-        font=font_body_small,
-        fill=INK_BROWN,
-        anchor="mm"
-    )
+    page1 = background1.convert("RGB")
     
     # =========================================================================
-    # PAGE 2: QR Code Page
+    # PAGE 2: QR Code Page with invitation_2.png background
     # =========================================================================
     
-    page2 = background.copy().convert("RGB")
+    page2 = background2.copy().convert("RGB")
     draw2 = ImageDraw.Draw(page2)
     
-    # Starting Y position (after logo area - matches Page 1)
+    # Starting Y position (after logo area)
     current_y = int(page_height * 0.32)
     
     # "SCAN ME AT THE ENTRANCE"

@@ -1,11 +1,42 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from src.api.deps import get_db
 from src.models.user import User
 from src.schemas.user import UserCreate, User as UserResponse, StudentRegister
 from src.services.user_service import UserService
+import asyncio
+import sys
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Import email function from the root email_utils module
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))))
+from email_utils import send_invitation_email
 
 router = APIRouter()
+
+def send_email_sync(recipient_email: str, student_name: str, index_number: str):
+    """Synchronous wrapper for async email function"""
+    logger.info(f"🚀 Starting email send to {recipient_email}")
+    try:
+        result = asyncio.run(
+            send_invitation_email(
+                recipient_email=recipient_email,
+                student_name=student_name,
+                index_number=index_number
+            )
+        )
+        logger.info(f"✅ Email send completed: {result}")
+        return result
+    except Exception as e:
+        logger.error(f"❌ Error sending email: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 @router.post("/", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -15,8 +46,12 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 @router.post("/register/", response_model=dict)
-def register_student(student: StudentRegister, db: Session = Depends(get_db)):
-    """Register a new student (no password required)"""
+async def register_student(
+    student: StudentRegister, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """Register a new student (no password required) and send invitation email"""
     # Check if user already exists
     existing_user = db.query(User).filter(
         (User.email == student.email) | (User.index_number == student.index_number)
@@ -35,7 +70,20 @@ def register_student(student: StudentRegister, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return {"success": True, "message": "Registration successful", "user_id": new_user.id}
+    
+    # Send invitation email in background using sync wrapper
+    background_tasks.add_task(
+        send_email_sync,
+        recipient_email=student.email,
+        student_name=student.name,
+        index_number=student.index_number,
+    )
+    
+    return {
+        "success": True, 
+        "message": f"Registration successful! An invitation email has been sent to {student.email}",
+        "user_id": new_user.id
+    }
 
 @router.get("/{user_id}", response_model=UserResponse)
 def read_user(user_id: int, db: Session = Depends(get_db)):
