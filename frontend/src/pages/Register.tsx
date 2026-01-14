@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { registerStudent } from "../api/api";
+// import { registerStudent } from "../api/api";
 import Input from "../components/Input";
 import Button from "../components/Button";
 

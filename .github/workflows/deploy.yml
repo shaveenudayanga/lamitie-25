@@ -70,7 +70,6 @@ jobs:
 
       - name: Deploy Backend
         run: |
-          # Sync backend files
           rsync -avz --delete \
             --exclude '__pycache__' \
             --exclude '*.pyc' \
@@ -81,7 +80,6 @@ jobs:
 
       - name: Deploy Frontend Build
         run: |
-          # Sync frontend build files
           rsync -avz --delete \
             frontend/dist/ ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.APP_DIR }}/frontend/dist/
 
