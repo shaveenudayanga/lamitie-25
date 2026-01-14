@@ -45,6 +45,11 @@ GOLD_ACCENT = "#C5A059"            # Metallic gold (kept for email theme)
 DARK_SLATE = "#1a1a1a"             # Dark mode background
 FOREST_GREEN = "#1a2f1a"           # Alternative dark background
 
+# Light colors for dark backgrounds
+LIGHT_TEXT = "#E0D8C3"             # Light cream/parchment text for dark backgrounds
+LIGHT_ACCENT = "#D4A574"           # Light brown/gold accent for dark backgrounds
+QR_LIGHT_COLOR = "#8B6B4A"         # Brownish color for QR code on dark background
+
 # Asset paths
 ASSETS_DIR = Path(__file__).parent / "assets"
 INVITATION_PAGE1_PATH = ASSETS_DIR / "invitation_1.png"
@@ -151,10 +156,10 @@ def generate_qr_code(
     
     # Choose colors based on style
     if parchment_style:
-        fill_color = INK_BROWN  # Dark brown ink
+        fill_color = INK_BROWN  # Dark brown ink for light backgrounds
         back_color = PARCHMENT_COLOR if not transparent else (0, 0, 0, 0)
     else:
-        fill_color = "#1a365d"  # Dark blue
+        fill_color = QR_LIGHT_COLOR  # Light brownish for dark backgrounds
         back_color = "white" if not transparent else (0, 0, 0, 0)
     
     # Create the image
@@ -346,38 +351,109 @@ def generate_ticket_pdf(
     font_divider = get_standard_serif_font(52)
     
     # =========================================================================
-    # PAGE 1: Use invitation_1.png as-is (no text overlay)
+    # PAGE 1: Personalized invitation with invitation_1.png background
     # =========================================================================
     
-    page1 = background1.convert("RGB")
+    page1 = background1.copy().convert("RGB")
+    draw1 = ImageDraw.Draw(page1)
+    
+    # Starting Y position (after logo area)
+    current_y = int(page_height * 0.30)
+    
+    # Student Name with "Dear"
+    display_name = f"Dear {student_name.title()}"
+    draw1.text(
+        (center_x, current_y),
+        display_name,
+        font=font_name,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 130
+    
+    # "We are delighted to invite you to"
+    draw1.text(
+        (center_x, current_y),
+        "We are delighted to invite you to",
+        font=font_body_small,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 85
+    
+    # "L'AMITIÉ 2K25" in gold accent
+    draw1.text(
+        (center_x, current_y),
+        "L'AMITIÉ 2K25",
+        font=font_title,
+        fill=LIGHT_ACCENT,
+        anchor="mm"
+    )
+    current_y += 100
+    
+    # Event details
+    draw1.text(
+        (center_x, current_y),
+        f"Date: {event_date}",
+        font=font_body,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 85
+    
+    draw1.text(
+        (center_x, current_y),
+        f"Time: {event_time}",
+        font=font_body,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    current_y += 85
+    
+    draw1.text(
+        (center_x, current_y),
+        f"Venue: {event_venue}",
+        font=font_body,
+        fill=LIGHT_TEXT,
+        anchor="mm"
+    )
+    if event_venue_sub:
+        current_y += 70
+        draw1.text(
+            (center_x, current_y),
+            event_venue_sub,
+            font=font_body_small,
+            fill=LIGHT_TEXT,
+            anchor="mm"
+        )
     
     # =========================================================================
-    # PAGE 2: QR Code Page with invitation_2.png background
+    # PAGE 2: QR Code Page with invitation_2.png background (light colors)
     # =========================================================================
     
     page2 = background2.copy().convert("RGB")
     draw2 = ImageDraw.Draw(page2)
     
     # Starting Y position (after logo area)
-    current_y = int(page_height * 0.32)
+    current_y = int(page_height * 0.26)
     
-    # "SCAN ME AT THE ENTRANCE"
+    # "SCAN ME AT THE ENTRANCE" - light color
     draw2.text(
         (center_x, current_y),
         "Scan me at the Entrance",
         font=font_title,
-        fill=INK_BROWN,
+        fill=LIGHT_TEXT,
         anchor="mm"
     )
     current_y += 125
     
-    # Generate QR code (transparent background to blend with parchment)
-    qr_size = int(min(page_width, page_height) * 0.45)
+    # Generate QR code with light color for dark background
+    qr_size = int(min(page_width, page_height) * 0.42)
     qr_image = generate_qr_code(
         index_number, 
         size=(qr_size, qr_size),
         transparent=True,
-        parchment_style=True
+        parchment_style=False  # Use light color instead
     )
     
     # Paste QR code (centered horizontally)
@@ -392,22 +468,22 @@ def generate_ticket_pdf(
     
     current_y = qr_y + qr_size + 105
     
-    # "NAME : Student Name"
+    # "NAME : Student Name" - light color
     draw2.text(
         (center_x, current_y),
         f"Name : {student_name.title()}",
         font=font_title,
-        fill=INK_BROWN,
+        fill=LIGHT_TEXT,
         anchor="mm"
     )
     current_y += 105
     
-    # "INDEX No : AS2022605"
+    # "INDEX No : AS2022605" - light color
     draw2.text(
         (center_x, current_y),
         f"Index No : {index_number}",
         font=font_title,
-        fill=INK_BROWN,
+        fill=LIGHT_TEXT,
         anchor="mm"
     )
     
