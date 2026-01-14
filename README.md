@@ -120,7 +120,7 @@ Mark student attendance by scanning QR code.
 **Request Body:**
 ```json
 {
-  "index_number": "2025CS001"
+  "index_number": "AS2022359"
 }
 ```
 
