@@ -1,9 +1,11 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
 
 class Settings(BaseSettings):
     db_url: str
     mail_username: str
     mail_password: str
+    allow_origins: List[str] = ["*"]
 
     model_config = SettingsConfigDict(
         env_file=".env",
