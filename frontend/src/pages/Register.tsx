@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-// import { registerStudent } from "../api/api";
+import { registerStudent } from "../api/api";
 import Input from "../components/Input";
 import Button from "../components/Button";
 
@@ -65,6 +65,13 @@ function Register() {
       // SUCCESS
       if (res.data.success) {
         alert(res.data.message);
+
+        setForm({
+          name: "",
+          index_number: "",
+          email: "",
+          combination: "",
+        });
       }
     } catch (err: any) {
       // Axios error handling
@@ -125,6 +132,7 @@ function Register() {
 
         <Input
           name="name"
+          value={form.name}
           placeholder="Name"
           className={fieldClass}
           onChange={handleChange}
@@ -133,6 +141,7 @@ function Register() {
 
         <Input
           name="index_number"
+          value={form.index_number}
           placeholder="Index Number"
           className={fieldClass}
           onChange={handleChange}
@@ -167,6 +176,7 @@ function Register() {
 
         <Input
           name="email"
+          value={form.email}
           placeholder="Email"
           className={fieldClass}
           onChange={handleChange}
