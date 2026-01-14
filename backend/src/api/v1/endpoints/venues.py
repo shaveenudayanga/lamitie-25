@@ -1,31 +1,32 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from src.db.session import get_db
-from src.models.venue import Venue
-from src.schemas.venue import VenueCreate, VenueUpdate
+from src.schemas.venue import VenueCreate, VenueUpdate, Venue as VenueResponse
 from src.services.venue_service import VenueService
 
 router = APIRouter()
-venue_service = VenueService()
 
-@router.post("/", response_model=Venue)
-async def create_venue(venue: VenueCreate, db: Session = Depends(get_db)):
+@router.post("/", response_model=VenueResponse)
+def create_venue(venue: VenueCreate, db: Session = Depends(get_db)):
     try:
-        return await venue_service.create_venue(venue, db)
+        service = VenueService(db)
+        return service.create_venue(venue)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/{venue_id}", response_model=Venue)
-async def read_venue(venue_id: int, db: Session = Depends(get_db)):
-    venue = await venue_service.get_venue(venue_id, db)
+@router.get("/{venue_id}", response_model=VenueResponse)
+def read_venue(venue_id: int, db: Session = Depends(get_db)):
+    service = VenueService(db)
+    venue = service.get_venue(venue_id)
     if venue is None:
         raise HTTPException(status_code=404, detail="Venue not found")
     return venue
 
-@router.put("/{venue_id}", response_model=Venue)
-async def update_venue(venue_id: int, venue: VenueUpdate, db: Session = Depends(get_db)):
+@router.put("/{venue_id}", response_model=VenueResponse)
+def update_venue(venue_id: int, venue: VenueUpdate, db: Session = Depends(get_db)):
     try:
-        updated_venue = await venue_service.update_venue(venue_id, venue, db)
+        service = VenueService(db)
+        updated_venue = service.update_venue(venue_id, venue)
         if updated_venue is None:
             raise HTTPException(status_code=404, detail="Venue not found")
         return updated_venue
@@ -33,9 +34,10 @@ async def update_venue(venue_id: int, venue: VenueUpdate, db: Session = Depends(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/{venue_id}", response_model=dict)
-async def delete_venue(venue_id: int, db: Session = Depends(get_db)):
+def delete_venue(venue_id: int, db: Session = Depends(get_db)):
     try:
-        result = await venue_service.delete_venue(venue_id, db)
+        service = VenueService(db)
+        result = service.delete_venue(venue_id)
         if not result:
             raise HTTPException(status_code=404, detail="Venue not found")
         return {"detail": "Venue deleted successfully"}
