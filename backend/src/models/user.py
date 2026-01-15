@@ -13,5 +13,3 @@ class User(Base):
     email = Column(String(255), unique=True, index=True)
     combination = Column(String(100), nullable=True)
     attendance_status = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=func.now(), server_default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), server_default=func.now())
