@@ -379,8 +379,8 @@ def generate_ticket_pdf(
     page1 = background1.copy().convert("RGB")
     draw1 = ImageDraw.Draw(page1)
     
-    # Starting Y position (after logo area - moved lower to avoid clash)
-    current_y = int(page_height * 0.32)
+    # Starting Y position (increased to give more space after logo)
+    current_y = int(page_height * 0.38)  # Changed from 0.32 to 0.38
     
     # Student Name with Dear
     display_name = f"Dear {student_name.title()}"
@@ -391,7 +391,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 125
+    current_y += 140  # Increased from 125
     
     # "We are delighted to invite you to"
     draw1.text(
@@ -401,7 +401,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 80
+    current_y += 95  # Increased from 80
     
     # "LAMITIE 2K25" in light accent
     draw1.text(
@@ -411,7 +411,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 85
+    current_y += 100  # Increased from 85
     
     # "An evening of excitement, entertainment and connection!"
     draw1.text(
@@ -421,7 +421,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 70
+    current_y += 80  # Increased from 70
     draw1.text(
         (center_x, current_y),
         "connection!",
@@ -429,7 +429,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 95
+    current_y += 110  # Increased from 95
     
     # Decorative divider
     draw1.text(
@@ -439,7 +439,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 75
+    current_y += 90  # Increased from 75
     
     # "DATE:"
     draw1.text(
@@ -449,7 +449,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 75
+    current_y += 85  # Increased from 75
     
     # Event Date in light accent
     draw1.text(
@@ -459,7 +459,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 85
+    current_y += 95  # Increased from 85
     
     # "TIME:"
     draw1.text(
@@ -469,7 +469,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 75
+    current_y += 85  # Increased from 75
     
     # Event Time in light accent
     draw1.text(
@@ -479,7 +479,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 85
+    current_y += 95  # Increased from 85
     
     # "VENUE:"
     draw1.text(
@@ -489,7 +489,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 75
+    current_y += 85  # Increased from 75
     
     # Venue name in light accent (large)
     draw1.text(
@@ -499,7 +499,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 85
+    current_y += 95  # Increased from 85
     
     # Venue sub-location
     if event_venue_sub:
@@ -510,9 +510,9 @@ def generate_ticket_pdf(
             fill=LIGHT_ACCENT,
             anchor="mm"
         )
-        current_y += 85
+        current_y += 95  # Increased from 85
     else:
-        current_y += 45
+        current_y += 50  # Increased from 45
     
     # Decorative divider
     draw1.text(
@@ -522,7 +522,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 95
+    current_y += 110  # Increased from 95
     
     # Important notice
     draw1.text(
