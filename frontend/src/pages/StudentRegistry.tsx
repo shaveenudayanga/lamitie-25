@@ -8,7 +8,7 @@ interface Student {
   index_number: string;
   combination: string;
   email: string;
-  is_attended?: boolean;
+  attendance_status?: boolean;
   created_at?: string;
 }
 
@@ -161,7 +161,7 @@ function StudentRegistry() {
                       </td>
                       <td className="text-[#e8dcc4]/70">{student.combination}</td>
                       <td>
-                        {student.is_attended ? (
+                        {student.attendance_status ? (
                           <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-900/30 border border-green-500/30 rounded-full text-green-400 text-sm">
                             <span>✓</span> Arrived
                           </span>

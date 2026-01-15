@@ -8,7 +8,7 @@ interface StudentData {
   index_number: string;
   combination: string;
   email: string;
-  is_attended?: boolean;
+  attendance_status?: boolean;
   created_at?: string;
 }
 
@@ -150,7 +150,7 @@ function StudentDetails() {
               <label className="block text-[#3e2723]/60 text-sm font-display uppercase tracking-wider mb-2">
                 Fellowship Status
               </label>
-              {student.is_attended ? (
+              {student.attendance_status ? (
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-800/20 border-2 border-green-600/50 rounded-lg text-green-700 font-display">
                   <span className="text-xl">✓</span>
                   <span>Present at the Gathering</span>
