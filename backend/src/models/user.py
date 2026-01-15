@@ -11,6 +11,7 @@ class User(Base):
     name = Column(String(255), index=True)
     index_number = Column(String(50), unique=True, index=True)
     email = Column(String(255), unique=True, index=True)
+    mobile_number = Column(String(20), nullable=True)
     combination = Column(String(100), nullable=True)
     attendance_status = Column(Boolean, default=False)
     created_at = Column(DateTime, default=func.now(), server_default=func.now())

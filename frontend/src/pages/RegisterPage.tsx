@@ -6,6 +6,7 @@ interface StudentForm {
   index_number: string;
   combination: string;
   email: string;
+  mobile_number: string;
 }
 
 const combinations = [
@@ -54,6 +55,7 @@ function RegisterPage() {
     name: "",
     index_number: "",
     email: "",
+    mobile_number: "",
     combination: "",
   });
 
@@ -91,6 +93,7 @@ function RegisterPage() {
           name: "",
           index_number: "",
           email: "",
+          mobile_number: "",
           combination: "",
         });
       }
@@ -265,6 +268,25 @@ function RegisterPage() {
               onChange={handleChange}
               placeholder="your.email@example.com"
               required
+              className="w-full bg-transparent border-b-2 border-[#c5a059]/50 
+                         text-[#3e2723] placeholder-[#3e2723]/40
+                         py-3 px-2 font-body text-lg
+                         focus:outline-none focus:border-[#c5a059]
+                         transition-all duration-300"
+            />
+          </div>
+
+          {/* Mobile Number Field */}
+          <div className="space-y-2">
+            <label className="block text-[#3e2723]/70 text-sm font-display uppercase tracking-wider">
+              Mobile Number
+            </label>
+            <input
+              type="tel"
+              name="mobile_number"
+              value={form.mobile_number}
+              onChange={handleChange}
+              placeholder="07XXXXXXXX"
               className="w-full bg-transparent border-b-2 border-[#c5a059]/50 
                          text-[#3e2723] placeholder-[#3e2723]/40
                          py-3 px-2 font-body text-lg

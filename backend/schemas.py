@@ -68,6 +68,15 @@ class RegistrationRequest(BaseModel):
         examples=["john.doe@university.edu"]
     )
     
+    # Mobile number (optional)
+    # For contact purposes
+    mobile_number: str | None = Field(
+        default=None,
+        max_length=20,
+        description="Student's mobile phone number",
+        examples=["0771234567"]
+    )
+    
     # Subject combination (required)
     combination: str = Field(
         ...,
@@ -210,6 +219,11 @@ class StudentResponse(BaseModel):
     email: EmailStr = Field(
         ...,
         description="Student's email address"
+    )
+    
+    mobile_number: str | None = Field(
+        default=None,
+        description="Student's mobile phone number"
     )
     
     combination: str = Field(

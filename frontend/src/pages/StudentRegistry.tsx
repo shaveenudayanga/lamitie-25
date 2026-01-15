@@ -8,6 +8,7 @@ interface Student {
   index_number: string;
   combination: string;
   email: string;
+  mobile_number?: string;
   attendance_status?: boolean;
   created_at?: string;
 }
@@ -39,7 +40,8 @@ function StudentRegistry() {
     (student) =>
       student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       student.index_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.combination.toLowerCase().includes(searchQuery.toLowerCase())
+      student.combination.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (student.mobile_number && student.mobile_number.includes(searchQuery))
   );
 
   return (

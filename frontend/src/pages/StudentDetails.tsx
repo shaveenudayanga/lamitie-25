@@ -8,6 +8,7 @@ interface StudentData {
   index_number: string;
   combination: string;
   email: string;
+  mobile_number?: string;
   attendance_status?: boolean;
   created_at?: string;
 }
@@ -144,6 +145,16 @@ function StudentDetails() {
               </label>
               <p className="text-[#3e2723]/80 text-sm break-all">{student.email}</p>
             </div>
+
+            {/* Mobile Number */}
+            {student.mobile_number && (
+              <div>
+                <label className="block text-[#3e2723]/60 text-sm font-display uppercase tracking-wider mb-1">
+                  Communication Crystal
+                </label>
+                <p className="text-[#3e2723]/80 text-sm">{student.mobile_number}</p>
+              </div>
+            )}
 
             {/* Status */}
             <div>

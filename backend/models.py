@@ -85,6 +85,14 @@ class Student(Base):
         comment="Student's email address"
     )
     
+    # Student's mobile number for contact
+    # Example: "0771234567"
+    mobile_number: Mapped[str] = mapped_column(
+        String(20),
+        nullable=True,
+        comment="Student's mobile phone number"
+    )
+    
     # Subject combination the student is enrolled in
     # Example: "Physical Science", "Biological Science", "Commerce"
     combination: Mapped[str] = mapped_column(

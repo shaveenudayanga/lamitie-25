@@ -236,6 +236,7 @@ async def register_student(
             name=registration.name,
             index_number=registration.index_number,
             email=registration.email,
+            mobile_number=registration.mobile_number,
             combination=registration.combination,
             attendance_status=False,  # Not attended yet
         )
