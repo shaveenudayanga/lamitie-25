@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -12,3 +13,5 @@ class User(Base):
     email = Column(String(255), unique=True, index=True)
     combination = Column(String(100), nullable=True)
     attendance_status = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=func.now(), server_default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), server_default=func.now())

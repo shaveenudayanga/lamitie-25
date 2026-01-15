@@ -3,6 +3,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 from src.config.settings import settings
 
+def get_db_url():
+    """Get the database URL from settings."""
+    return settings.db_url
+
 engine = create_engine(
     settings.db_url,
     pool_pre_ping=True,
