@@ -216,7 +216,7 @@ function StudentDetails() {
           ← Back to Archives
         </Link>
         <Link to="/gate" className="btn-rune">
-          Check Attendance →
+          Mark Attendance →
         </Link>
       </div>
 

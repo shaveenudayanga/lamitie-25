@@ -22,7 +22,7 @@ const destinations = [
   },
   {
     path: "/gate",
-    title: "Check Attendance",
+    title: "Mark Attendance",
     subtitle: "Scan QR Codes",
     icon: "✓",
     description: "Scan student QR codes to mark attendance at the event.",

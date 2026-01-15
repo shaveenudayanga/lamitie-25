@@ -12,7 +12,7 @@ const navItems = [
   { path: "/", label: "Dashboard" },
   { path: "/register", label: "Register Student" },
   { path: "/archives", label: "Student List" },
-  { path: "/gate", label: "Check Attendance" },
+  { path: "/gate", label: "Mark Attendance" },
 ];
 
 function AppLayout({ children }: AppLayoutProps) {
