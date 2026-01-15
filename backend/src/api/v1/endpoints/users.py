@@ -85,6 +85,14 @@ async def register_student(
         "user_id": new_user.id
     }
 
+@router.get("/index/{index_number}", response_model=UserResponse)
+def read_user_by_index(index_number: str, db: Session = Depends(get_db)):
+    """Get user by index number (e.g., AS2023359)"""
+    db_user = db.query(User).filter(User.index_number == index_number).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail=f"User with index number {index_number} not found")
+    return db_user
+
 @router.get("/{user_id}", response_model=UserResponse)
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = UserService.get_user(db=db, user_id=user_id)

@@ -15,4 +15,4 @@ export const scanAttendance = (data: any) => API.post("/registrations/scan/", da
 
 // ADMIN
 export const getStudents = () => API.get("/users/");
-export const getStudent = (index: any) => API.get(`/users/${index}/`);
+export const getStudent = (index: any) => API.get(`/users/index/${index}/`);
