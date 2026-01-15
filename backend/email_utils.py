@@ -214,8 +214,8 @@ def generate_qr_code_bytes(data: str) -> bytes:
 
 def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     """
-    Get decorative script/calligraphy font suitable for Lord of the Rings theme.
-    Prioritizes decorative, cursive, and ornamental system fonts.
+    Get decorative font for the PDF invitation.
+    Uses Cinzel Decorative (fantasy-style) for titles and Lora/EB Garamond for body.
     
     Args:
         size: Font size in pixels
@@ -224,33 +224,17 @@ def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     Returns:
         ImageFont: The loaded font
     """
-    # List of decorative/script fonts (in order of preference)
+    # Get the fonts directory path
+    fonts_dir = ASSETS_DIR / "fonts"
+    
+    # PRIMARY: Use downloaded Google Fonts (all tested and working!)
     font_candidates = [
-        # Linux - Decorative fonts
-        "/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf",
-        "/usr/share/fonts/truetype/uralic/Tharlon-Regular.ttf",
-        "/usr/share/fonts/truetype/ubuntu/Ubuntu-CondensedItalic.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-BoldOblique.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Oblique.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf",
-        # macOS - Script and decorative fonts
-        "/System/Library/Fonts/Supplemental/Zapfino.ttf",  # Highly decorative script
-        "/System/Library/Fonts/Supplemental/Snell Roundhand.ttc",  # Elegant script
-        "/System/Library/Fonts/Supplemental/Bradley Hand Bold.ttf",  # Handwritten style
-        "/System/Library/Fonts/Supplemental/Brush Script.ttf",  # Brush script
-        "/System/Library/Fonts/Supplemental/Apple Chancery.ttf",  # Medieval style
-        "/System/Library/Fonts/Supplemental/Papyrus.ttc",  # Ancient style
-        "/System/Library/Fonts/Supplemental/Copperplate.ttc",  # Elegant engraved
-        # Windows - Script and decorative fonts
-        "C:/Windows/Fonts/MTCORSVA.TTF",  # Monotype Corsiva (elegant script)
-        "C:/Windows/Fonts/BRUSHSCI.TTF",  # Brush Script MT
-        "C:/Windows/Fonts/ITCBLKAD.TTF",  # Blackadder ITC (medieval)
-        "C:/Windows/Fonts/BRADHITC.TTF",  # Bradley Hand ITC
-        "C:/Windows/Fonts/FREESCPT.TTF",  # Freestyle Script
-        "C:/Windows/Fonts/FRSCRIPT.TTF",  # French Script MT
-        "C:/Windows/Fonts/KUNSTLER.TTF",  # Kunstler Script
-        "C:/Windows/Fonts/VIVALDII.TTF",  # Vivaldi (italic script)
-        "C:/Windows/Fonts/MISTRAL.TTF",  # Mistral
-        "C:/Windows/Fonts/PAPYRUS.TTF",  # Papyrus
+        # Cinzel Decorative - Elegant fantasy-style font (WORKS!)
+        str(fonts_dir / "CinzelDecorative-Bold.ttf") if bold else str(fonts_dir / "CinzelDecorative-Regular.ttf"),
+        # Lora - Readable serif font (WORKS!)
+        str(fonts_dir / "Lora-Regular.ttf"),
+        # EB Garamond - Elegant serif font (WORKS!)
+        str(fonts_dir / "EB-Garamond-Regular.ttf"),
     ]
     
     for font_path in font_candidates:
@@ -260,56 +244,76 @@ def get_fantasy_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
             except Exception:
                 continue
     
-    # Fallback to italic serif
-    try:
-        return ImageFont.truetype("DejaVuSerif-Italic.ttf", size)
-    except Exception:
-        return ImageFont.load_default()
+    # Fallback to common system fonts with better readability
+    fallback_fonts = [
+        "Arial.ttf",
+        "Times.ttf", 
+        "TimesNewRoman.ttf",
+        "Georgia.ttf",
+        "DejaVuSerif.ttf",
+        "DejaVuSerif-Italic.ttf"
+    ]
+    
+    for fallback in fallback_fonts:
+        try:
+            return ImageFont.truetype(fallback, size)
+        except Exception:
+            continue
+    
+    # Last resort: use default but at a readable size
+    return ImageFont.load_default()
 
 
 def get_standard_serif_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     """
-    Get a decorative ornamental font for dividers and special elements.
-    Uses script/decorative fonts for a more fantasy feel.
+    Get a serif font for dividers and special elements.
+    Uses Lora or EB Garamond (elegant, readable serif fonts).
     
     Args:
         size: Font size in pixels
         bold: Whether to use bold variant
         
     Returns:
-        ImageFont: The loaded decorative font
+        ImageFont: The loaded font
     """
+    # Get the fonts directory path
+    fonts_dir = ASSETS_DIR / "fonts"
+    
     font_candidates = [
-        # Linux - Ornamental fonts
-        "/usr/share/fonts/truetype/ancient-scripts/Symbola_hint.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-ExtraLight.ttf",
-        "/usr/share/fonts/truetype/ubuntu/Ubuntu-LightItalic.ttf",
-        # macOS - Decorative fonts
-        "/System/Library/Fonts/Supplemental/Copperplate.ttc",  # Engraved style
-        "/System/Library/Fonts/Supplemental/Zapfino.ttf",  # Highly decorative
-        "/System/Library/Fonts/Supplemental/Snell Roundhand.ttc",
-        "/System/Library/Fonts/Supplemental/Apple Chancery.ttf",
-        "/System/Library/Fonts/Supplemental/Papyrus.ttc",
-        # Windows - Ornamental fonts
-        "C:/Windows/Fonts/COPRGTB.TTF",  # Copperplate Gothic Bold
-        "C:/Windows/Fonts/MTCORSVA.TTF",  # Monotype Corsiva
-        "C:/Windows/Fonts/KUNSTLER.TTF",  # Kunstler Script
-        "C:/Windows/Fonts/PAPYRUS.TTF",  # Papyrus
-        "C:/Windows/Fonts/MISTRAL.TTF",  # Mistral
+        # Lora - Readable serif font (WORKS!)
+        str(fonts_dir / "Lora-Regular.ttf"),
+        # EB Garamond - Elegant serif font (WORKS!)
+        str(fonts_dir / "EB-Garamond-Regular.ttf"),
+        # Cinzel Decorative as last option
+        str(fonts_dir / "CinzelDecorative-Bold.ttf") if bold else str(fonts_dir / "CinzelDecorative-Regular.ttf"),
     ]
     
     for font_path in font_candidates:
         if os.path.exists(font_path):
             try:
                 return ImageFont.truetype(font_path, size)
-            except Exception:
+            except Exception as e:
+                print(f"Failed to load font {font_path}: {e}")
                 continue
     
-    # Fallback to default font
-    try:
-        return ImageFont.truetype("DejaVuSans-ExtraLight.ttf", size)
-    except Exception:
-        return ImageFont.load_default()
+    # Fallback to macOS system fonts
+    fallback_fonts = [
+        "/System/Library/Fonts/Supplemental/Times New Roman.ttf",
+        "/System/Library/Fonts/Supplemental/Georgia.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/Library/Fonts/Arial.ttf",
+    ]
+    
+    for fallback in fallback_fonts:
+        try:
+            return ImageFont.truetype(fallback, size)
+        except Exception:
+            continue
+    
+    # Last resort
+    print(f"WARNING: All fonts failed to load! Using PIL default (will be tiny)")
+    return ImageFont.load_default()
 
 
 def generate_ticket_pdf(
@@ -354,19 +358,19 @@ def generate_ticket_pdf(
     page_width, page_height = background1.size
     center_x = page_width // 2
     
-    # Load fonts at various sizes (2x increase for better readability)
-    font_title_large = get_fantasy_font(104, bold=True)
-    font_title = get_fantasy_font(84, bold=True)
-    font_name = get_fantasy_font(96, bold=True)
-    font_body = get_fantasy_font(64)
-    font_body_small = get_fantasy_font(52)
-    font_label = get_fantasy_font(48)
-    font_event_detail = get_fantasy_font(76, bold=True)
-    font_venue = get_fantasy_font(96, bold=True)
-    font_venue_sub = get_fantasy_font(60)
+    # Load fonts at EXTRA LARGE sizes for maximum readability
+    font_title_large = get_fantasy_font(280, bold=True)  # "L'AMITIÉ 2K25"
+    font_title = get_fantasy_font(220, bold=True)        # Subtitles
+    font_name = get_fantasy_font(240, bold=True)         # Student name
+    font_body = get_fantasy_font(160)                    # Body text
+    font_body_small = get_fantasy_font(140)              # Smaller body text
+    font_label = get_fantasy_font(130)                   # Labels
+    font_event_detail = get_fantasy_font(180, bold=True) # Event details
+    font_venue = get_fantasy_font(240, bold=True)        # Venue names
+    font_venue_sub = get_fantasy_font(150)               # Venue subtitles
     
     # Decorative divider font (standard serif, not LOTR)
-    font_divider = get_standard_serif_font(52)
+    font_divider = get_standard_serif_font(140)
     
     # =========================================================================
     # PAGE 1: Personalized invitation with invitation_1.png background
