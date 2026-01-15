@@ -358,19 +358,19 @@ def generate_ticket_pdf(
     page_width, page_height = background1.size
     center_x = page_width // 2
     
-    # Load fonts at EXTRA LARGE sizes for maximum readability
-    font_title_large = get_fantasy_font(280, bold=True)  # "L'AMITIÉ 2K25"
-    font_title = get_fantasy_font(220, bold=True)        # Subtitles
-    font_name = get_fantasy_font(240, bold=True)         # Student name
-    font_body = get_fantasy_font(160)                    # Body text
-    font_body_small = get_fantasy_font(140)              # Smaller body text
-    font_label = get_fantasy_font(130)                   # Labels
-    font_event_detail = get_fantasy_font(180, bold=True) # Event details
-    font_venue = get_fantasy_font(240, bold=True)        # Venue names
-    font_venue_sub = get_fantasy_font(150)               # Venue subtitles
+    # Load fonts at balanced sizes for readability
+    font_title_large = get_fantasy_font(120, bold=True)  # "L'AMITIÉ 2K25"
+    font_title = get_fantasy_font(96, bold=True)         # Subtitles
+    font_name = get_fantasy_font(110, bold=True)         # Student name
+    font_body = get_fantasy_font(72)                     # Body text
+    font_body_small = get_fantasy_font(64)               # Smaller body text
+    font_label = get_fantasy_font(60)                    # Labels
+    font_event_detail = get_fantasy_font(80, bold=True)  # Event details
+    font_venue = get_fantasy_font(110, bold=True)        # Venue names
+    font_venue_sub = get_fantasy_font(68)                # Venue subtitles
     
-    # Decorative divider font (standard serif, not LOTR)
-    font_divider = get_standard_serif_font(140)
+    # Decorative divider font (use simple dashes instead of fancy characters)
+    font_divider = get_standard_serif_font(60)
     
     # =========================================================================
     # PAGE 1: Personalized invitation with invitation_1.png background
@@ -434,7 +434,7 @@ def generate_ticket_pdf(
     # Decorative divider
     draw1.text(
         (center_x, current_y),
-        "═══ ◆ ═══",
+        "--- * ---",
         font=font_divider,
         fill=LIGHT_TEXT,
         anchor="mm"
@@ -517,7 +517,7 @@ def generate_ticket_pdf(
     # Decorative divider
     draw1.text(
         (center_x, current_y),
-        "═══ ◆ ═══",
+        "--- * ---",
         font=font_divider,
         fill=LIGHT_TEXT,
         anchor="mm"
