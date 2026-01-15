@@ -8,3 +8,7 @@ fastapi-mail
 python-dotenv
 python-multipart
 pydantic-settings
+python-jose[cryptography]
+passlib[bcrypt]
+alembic
+pymysql

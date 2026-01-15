@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from src.schemas.registration import RegistrationCreate, RegistrationResponse
 from src.services.registration_service import RegistrationService
 from src.models.user import User
-from src.api.deps import get_db
+from src.api.deps import get_db, get_current_admin
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -14,7 +14,8 @@ class ScanRequest(BaseModel):
 @router.post("/", response_model=RegistrationResponse)
 async def create_registration(
     registration: RegistrationCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_current_admin)  # Protected: requires auth
 ):
     try:
         registration_service = RegistrationService(db)
@@ -24,7 +25,11 @@ async def create_registration(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/scan/", response_model=dict)
-async def scan_attendance(scan: ScanRequest, db: Session = Depends(get_db)):
+async def scan_attendance(
+    scan: ScanRequest, 
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_current_admin)  # Protected: requires auth
+):
     """Mark student attendance by scanning QR code or manual entry"""
     user = db.query(User).filter(User.index_number == scan.index_number).first()
     

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
-from src.api.deps import get_db
+from src.api.deps import get_db, get_current_admin
 from src.models.user import User
 from src.schemas.user import UserCreate, User as UserResponse, StudentRegister
 from src.services.user_service import UserService
@@ -39,7 +39,11 @@ def send_email_sync(recipient_email: str, student_name: str, index_number: str):
         return False
 
 @router.post("/", response_model=UserResponse)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
+def create_user(
+    user: UserCreate, 
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_current_admin)  # Protected: requires auth
+):
     db_user = UserService.create_user(db=db, user=user)
     if db_user is None:
         raise HTTPException(status_code=400, detail="User already exists")
@@ -49,7 +53,8 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 async def register_student(
     student: StudentRegister, 
     background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_current_admin)  # Protected: requires auth
 ):
     """Register a new student (no password required) and send invitation email"""
     # Check if user already exists
@@ -86,7 +91,11 @@ async def register_student(
     }
 
 @router.get("/index/{index_number}", response_model=UserResponse)
-def read_user_by_index(index_number: str, db: Session = Depends(get_db)):
+def read_user_by_index(
+    index_number: str, 
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_current_admin)  # Protected: requires auth
+):
     """Get user by index number (e.g., AS2023359)"""
     db_user = db.query(User).filter(User.index_number == index_number).first()
     if db_user is None:
@@ -94,13 +103,22 @@ def read_user_by_index(index_number: str, db: Session = Depends(get_db)):
     return db_user
 
 @router.get("/{user_id}", response_model=UserResponse)
-def read_user(user_id: int, db: Session = Depends(get_db)):
+def read_user(
+    user_id: int, 
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_current_admin)  # Protected: requires auth
+):
     db_user = UserService.get_user(db=db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
 @router.get("/", response_model=list[UserResponse])
-def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def read_users(
+    skip: int = 0, 
+    limit: int = 10, 
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_current_admin)  # Protected: requires auth
+):
     users = UserService.get_users(db=db, skip=skip, limit=limit)
     return users

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { removeAuthToken } from "../../api/api";
 import logoImage from "../../assets/Lamitie_2k25_Logo_NoShadow.png";
 
 interface AppLayoutProps {
@@ -17,6 +18,12 @@ const navItems = [
 function AppLayout({ children }: AppLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    removeAuthToken();
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-mordor">
@@ -67,6 +74,13 @@ function AppLayout({ children }: AppLayoutProps) {
                   </Link>
                 );
               })}
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-lg font-display text-sm transition-all duration-200 text-red-400/80 hover:text-red-400 hover:bg-red-400/10 ml-2"
+              >
+                Logout
+              </button>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -109,6 +123,16 @@ function AppLayout({ children }: AppLayoutProps) {
                   </Link>
                 );
               })}
+              {/* Mobile Logout Button */}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="flex items-center px-4 py-3 rounded-lg my-1 transition-all text-red-400 hover:bg-red-400/10 w-full"
+              >
+                <span className="font-display">Logout</span>
+              </button>
             </div>
           </nav>
         )}
