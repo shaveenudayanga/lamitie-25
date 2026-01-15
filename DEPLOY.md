@@ -1,22 +1,39 @@
 # L'amitié 2025 - Deployment Guide
 
-## 🚀 Quick Deploy
+## 🚀 Automatic Deployment (Recommended)
 
-After making changes and pushing to GitHub, deploy to production:
+**Just push to GitHub and relax!** 
+
+The GitHub Actions workflow automatically deploys everything:
+
+```bash
+git add -A
+git commit -m "Your changes"
+git push
+```
+
+That's it! GitHub Actions will:
+1. ✅ Build the frontend
+2. ✅ Deploy backend code
+3. ✅ Install Python dependencies
+4. ✅ Deploy frontend to nginx
+5. ✅ Restart services
+
+Check deployment status: [GitHub Actions](https://github.com/shaveenudayanga/lamitie-25/actions)
+
+---
+
+## 🛠️ Manual Deployment (Backup Method)
+
+If GitHub Actions fails or you need to deploy manually:
 
 ```bash
 ./deploy.sh
 ```
 
-That's it! The script will:
-1. ✅ Copy updated backend code to server
-2. ✅ Install any new Python packages
-3. ✅ Restart backend service
-4. ✅ Copy updated frontend code to server
-5. ✅ Rebuild frontend
-6. ✅ Deploy to nginx
+**Note:** Manual deployment is slower. Use automatic deployment whenever possible.
 
-## 📋 Manual Deployment Steps
+---
 
 If you need to deploy manually:
 
