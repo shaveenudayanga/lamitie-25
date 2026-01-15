@@ -401,7 +401,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 82  # Reduced from 95
+    current_y += 95  # Reduced from 95
     
     # "LAMITIE 2K25" in light accent
     draw1.text(
@@ -411,7 +411,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 88  # Reduced from 100
+    current_y += 95  # Reduced from 100
     
     # "An evening of excitement, entertainment and connection!"
     draw1.text(
@@ -439,7 +439,7 @@ def generate_ticket_pdf(
     #     fill=LIGHT_TEXT,
     #     anchor="mm"
     # )
-    current_y += 90  # Reduced from 90
+    current_y += 90 
     
     # "DATE:"
     draw1.text(
@@ -449,7 +449,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 75  # Reduced from 85
+    current_y += 80  
     
     # Event Date in light accent
     draw1.text(
@@ -459,7 +459,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 95  # Reduced from 95
+    current_y += 125 
     
     # "TIME:"
     draw1.text(
@@ -469,8 +469,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 75  # Reduced from 85
-    
+    current_y += 80 
     # Event Time in light accent
     draw1.text(
         (center_x, current_y),
@@ -479,7 +478,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 95  # Reduced from 95
+    current_y += 125 
     
     # "VENUE:"
     draw1.text(
@@ -489,7 +488,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 78  # Reduced from 85
+    current_y += 90 
     
     # Venue name in light accent (large)
     draw1.text(
@@ -499,7 +498,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 82  # Reduced from 95
+    current_y += 125  
     
     # Venue sub-location
     if event_venue_sub:
@@ -540,7 +539,7 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 75
+    current_y += 90
     draw1.text(
         (center_x, current_y),
         "IT'S YOUR ENTRY PASS",
@@ -548,7 +547,7 @@ def generate_ticket_pdf(
         fill=LIGHT_ACCENT,
         anchor="mm"
     )
-    current_y += 75
+    current_y += 90
     draw1.text(
         (center_x, current_y),
         "to the event!",
@@ -606,9 +605,9 @@ def generate_ticket_pdf(
         fill=LIGHT_TEXT,
         anchor="mm"
     )
-    current_y += 120
+    current_y += 130
     
-    # "INDEX No : AS2022605" - light color
+    # "INDEX No : AS2023XXX" - light color
     draw2.text(
         (center_x, current_y),
         f"Index No : {index_number}",
