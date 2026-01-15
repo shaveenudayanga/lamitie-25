@@ -16,7 +16,7 @@ const Login: React.FC = () => {
     try {
       const response = await login(password);
       setAuthToken(response.data.access_token);
-      navigate("/dashboard");
+      navigate("/");
     } catch (err: any) {
       setError(err.response?.data?.detail || "Invalid password. Please try again.");
     } finally {
