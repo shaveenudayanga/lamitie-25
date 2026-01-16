@@ -129,6 +129,7 @@ def read_users(
 def update_student_by_index(
     index_number: str,
     student_update: StudentRegister,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     admin: dict = Depends(get_current_admin)  # Protected: requires auth
 ):
@@ -137,8 +138,15 @@ def update_student_by_index(
     if db_user is None:
         raise HTTPException(status_code=404, detail=f"User with index number {index_number} not found")
     
+    # Track what fields are changing (before validation)
+    email_changed = student_update.email != db_user.email
+    name_changed = student_update.name != db_user.name
+    index_changed = student_update.index_number != db_user.index_number
+    combination_changed = student_update.combination != db_user.combination
+    mobile_changed = student_update.mobile_number != db_user.mobile_number
+    
     # Check if new email or index number conflicts with existing users (excluding current user)
-    if student_update.email != db_user.email:
+    if email_changed:
         existing_email = db.query(User).filter(
             User.email == student_update.email,
             User.id != db_user.id
@@ -146,7 +154,7 @@ def update_student_by_index(
         if existing_email:
             raise HTTPException(status_code=400, detail="Email already exists for another user")
     
-    if student_update.index_number != db_user.index_number:
+    if index_changed:
         existing_index = db.query(User).filter(
             User.index_number == student_update.index_number,
             User.id != db_user.id
@@ -163,4 +171,15 @@ def update_student_by_index(
     
     db.commit()
     db.refresh(db_user)
+    
+    # Send email if email, name, or index number changed (ignore combination/mobile changes)
+    if email_changed or name_changed or index_changed:
+        logger.info(f"📧 Sending update notification email to {db_user.email} (email={email_changed}, name={name_changed}, index={index_changed})")
+        background_tasks.add_task(
+            send_email_sync,
+            recipient_email=db_user.email,
+            student_name=db_user.name,
+            index_number=db_user.index_number,
+        )
+    
     return db_user
