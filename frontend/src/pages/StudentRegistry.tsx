@@ -18,6 +18,8 @@ function StudentRegistry() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const studentsPerPage = 10;
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -43,6 +45,23 @@ function StudentRegistry() {
       student.combination.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (student.mobile_number && student.mobile_number.includes(searchQuery))
   );
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+  const startIndex = (currentPage - 1) * studentsPerPage;
+  const endIndex = startIndex + studentsPerPage;
+  const currentStudents = filteredStudents.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -91,7 +110,9 @@ function StudentRegistry() {
         </div>
         <div className="glass-dark px-6 py-3 rounded-lg">
           <span className="text-[#c5a059]/60 text-sm">Showing:</span>
-          <span className="ml-2 text-[#c5a059] font-display text-xl">{filteredStudents.length}</span>
+          <span className="ml-2 text-[#c5a059] font-display text-xl">
+            {startIndex + 1}-{Math.min(endIndex, filteredStudents.length)} of {filteredStudents.length}
+          </span>
         </div>
       </div>
 
@@ -148,9 +169,9 @@ function StudentRegistry() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredStudents.map((student, index) => (
+                  {currentStudents.map((student, index) => (
                     <tr key={student.id} className="group">
-                      <td className="text-[#c5a059]/50">{index + 1}</td>
+                      <td className="text-[#c5a059]/50">{startIndex + index + 1}</td>
                       <td>
                         <div className="font-display text-[#e8dcc4]">
                           {student.name}
@@ -187,6 +208,79 @@ function StudentRegistry() {
                 </tbody>
               </table>
             </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-6 pt-6 border-t border-[#c5a059]/20">
+                {/* First Page */}
+                <button
+                  onClick={() => goToPage(1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 text-[#c5a059] hover:bg-[#c5a059]/20 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="First page"
+                >
+                  ««
+                </button>
+                
+                {/* Previous Page */}
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 text-[#c5a059] hover:bg-[#c5a059]/20 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Previous page"
+                >
+                  ‹ Prev
+                </button>
+                
+                {/* Page Numbers */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(page => {
+                      // Show first page, last page, current page, and pages around current
+                      return page === 1 || 
+                             page === totalPages || 
+                             (page >= currentPage - 1 && page <= currentPage + 1);
+                    })
+                    .map((page, idx, arr) => (
+                      <span key={page} className="flex items-center">
+                        {idx > 0 && arr[idx - 1] !== page - 1 && (
+                          <span className="px-2 text-[#c5a059]/50">...</span>
+                        )}
+                        <button
+                          onClick={() => goToPage(page)}
+                          className={`w-10 h-10 rounded-lg font-display transition-colors ${
+                            currentPage === page
+                              ? "bg-[#c5a059] text-[#1a1410]"
+                              : "text-[#c5a059] hover:bg-[#c5a059]/20"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      </span>
+                    ))}
+                </div>
+                
+                {/* Next Page */}
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 text-[#c5a059] hover:bg-[#c5a059]/20 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Next page"
+                >
+                  Next ›
+                </button>
+                
+                {/* Last Page */}
+                <button
+                  onClick={() => goToPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 text-[#c5a059] hover:bg-[#c5a059]/20 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Last page"
+                >
+                  »»
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

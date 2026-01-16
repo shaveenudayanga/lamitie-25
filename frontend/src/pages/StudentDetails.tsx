@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getStudent } from "../api/api";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { getStudent, updateStudent } from "../api/api";
 
 interface StudentData {
   id: number;
@@ -15,9 +15,19 @@ interface StudentData {
 
 function StudentDetails() {
   const { indexNumber } = useParams<{ indexNumber: string }>();
+  const navigate = useNavigate();
   const [student, setStudent] = useState<StudentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    index_number: "",
+    email: "",
+    mobile_number: "",
+    combination: ""
+  });
 
   useEffect(() => {
     const fetchStudent = async () => {
@@ -26,6 +36,13 @@ function StudentDetails() {
       try {
         const response = await getStudent(indexNumber);
         setStudent(response.data);
+        setEditForm({
+          name: response.data.name,
+          index_number: response.data.index_number,
+          email: response.data.email,
+          mobile_number: response.data.mobile_number || "",
+          combination: response.data.combination
+        });
         setError(null);
       } catch (err: any) {
         console.error("Failed to fetch student:", err);
@@ -39,6 +56,43 @@ function StudentDetails() {
     };
     fetchStudent();
   }, [indexNumber]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    if (!indexNumber) return;
+    setSaving(true);
+    try {
+      const response = await updateStudent(indexNumber, editForm);
+      setStudent(response.data);
+      setIsEditing(false);
+      // If index number changed, navigate to the new URL
+      if (editForm.index_number !== indexNumber) {
+        navigate(`/student/${editForm.index_number}`, { replace: true });
+      }
+    } catch (err: any) {
+      console.error("Failed to update student:", err);
+      alert(err?.response?.data?.detail || "Failed to update student details");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    if (student) {
+      setEditForm({
+        name: student.name,
+        index_number: student.index_number,
+        email: student.email,
+        mobile_number: student.mobile_number || "",
+        combination: student.combination
+      });
+    }
+    setIsEditing(false);
+  };
 
   // Generate QR code URL (using a public QR code API)
   const qrCodeUrl = indexNumber
@@ -107,6 +161,34 @@ function StudentDetails() {
 
       {/* Character Card */}
       <div className="card-scroll animate-fade-in-up max-w-2xl mx-auto" style={{ animationDelay: "0.2s" }}>
+        {/* Edit Toggle Button */}
+        <div className="flex justify-end mb-4">
+          {!isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#c5a059]/20 border border-[#c5a059]/50 rounded-lg text-[#3e2723] hover:bg-[#c5a059]/30 transition-colors font-display text-sm"
+            >
+              <span>✎</span> Edit Details
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={handleCancel}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 border border-gray-400 rounded-lg text-gray-700 hover:bg-gray-300 transition-colors font-display text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 border border-green-700 rounded-lg text-white hover:bg-green-700 transition-colors font-display text-sm disabled:opacity-50"
+              >
+                {saving ? "Saving..." : "✓ Save Changes"}
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="grid md:grid-cols-2 gap-8">
           {/* Left: Info */}
           <div className="space-y-6">
@@ -115,9 +197,19 @@ function StudentDetails() {
               <label className="block text-[#3e2723]/60 text-sm font-display uppercase tracking-wider mb-1">
                 Name
               </label>
-              <p className="font-display text-2xl text-[#3e2723]">
-                {student.name}
-              </p>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="name"
+                  value={editForm.name}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border-2 border-[#c5a059]/50 rounded-lg bg-white text-[#3e2723] font-display text-xl focus:outline-none focus:border-[#c5a059]"
+                />
+              ) : (
+                <p className="font-display text-2xl text-[#3e2723]">
+                  {student.name}
+                </p>
+              )}
             </div>
 
             {/* Index Number */}
@@ -125,9 +217,19 @@ function StudentDetails() {
               <label className="block text-[#3e2723]/60 text-sm font-display uppercase tracking-wider mb-1">
                 Index of Identification
               </label>
-              <code className="text-[#800020] bg-[#800020]/10 px-3 py-1 rounded font-display text-xl">
-                {student.index_number}
-              </code>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="index_number"
+                  value={editForm.index_number}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border-2 border-[#c5a059]/50 rounded-lg bg-white text-[#800020] font-display text-xl focus:outline-none focus:border-[#c5a059]"
+                />
+              ) : (
+                <code className="text-[#800020] bg-[#800020]/10 px-3 py-1 rounded font-display text-xl">
+                  {student.index_number}
+                </code>
+              )}
             </div>
 
             {/* Combination */}
@@ -135,7 +237,17 @@ function StudentDetails() {
               <label className="block text-[#3e2723]/60 text-sm font-display uppercase tracking-wider mb-1">
                 Path of Study
               </label>
-              <p className="text-[#3e2723] text-lg">{student.combination}</p>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="combination"
+                  value={editForm.combination}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border-2 border-[#c5a059]/50 rounded-lg bg-white text-[#3e2723] text-lg focus:outline-none focus:border-[#c5a059]"
+                />
+              ) : (
+                <p className="text-[#3e2723] text-lg">{student.combination}</p>
+              )}
             </div>
 
             {/* Email */}
@@ -143,18 +255,37 @@ function StudentDetails() {
               <label className="block text-[#3e2723]/60 text-sm font-display uppercase tracking-wider mb-1">
                 Raven Address
               </label>
-              <p className="text-[#3e2723]/80 text-sm break-all">{student.email}</p>
+              {isEditing ? (
+                <input
+                  type="email"
+                  name="email"
+                  value={editForm.email}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border-2 border-[#c5a059]/50 rounded-lg bg-white text-[#3e2723]/80 text-sm focus:outline-none focus:border-[#c5a059]"
+                />
+              ) : (
+                <p className="text-[#3e2723]/80 text-sm break-all">{student.email}</p>
+              )}
             </div>
 
             {/* Mobile Number */}
-            {student.mobile_number && (
-              <div>
-                <label className="block text-[#3e2723]/60 text-sm font-display uppercase tracking-wider mb-1">
-                  Communication Crystal
-                </label>
-                <p className="text-[#3e2723]/80 text-sm">{student.mobile_number}</p>
-              </div>
-            )}
+            <div>
+              <label className="block text-[#3e2723]/60 text-sm font-display uppercase tracking-wider mb-1">
+                Communication Crystal
+              </label>
+              {isEditing ? (
+                <input
+                  type="tel"
+                  name="mobile_number"
+                  value={editForm.mobile_number}
+                  onChange={handleInputChange}
+                  placeholder="Enter phone number"
+                  className="w-full px-3 py-2 border-2 border-[#c5a059]/50 rounded-lg bg-white text-[#3e2723]/80 text-sm focus:outline-none focus:border-[#c5a059]"
+                />
+              ) : (
+                <p className="text-[#3e2723]/80 text-sm">{student.mobile_number || "Not provided"}</p>
+              )}
+            </div>
 
             {/* Status */}
             <div>

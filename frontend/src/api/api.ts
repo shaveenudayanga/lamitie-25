@@ -62,3 +62,4 @@ export const scanAttendance = (data: any) => API.post("/registrations/scan/", da
 // ADMIN (Protected)
 export const getStudents = () => API.get("/users/");
 export const getStudent = (index: any) => API.get(`/users/index/${index}/`);
+export const updateStudent = (index: string, data: any) => API.put(`/users/index/${index}/`, data);

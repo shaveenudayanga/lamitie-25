@@ -117,9 +117,50 @@ def read_user(
 @router.get("/", response_model=list[UserResponse])
 def read_users(
     skip: int = 0, 
-    limit: int = 10, 
+    limit: int = 1000, 
     db: Session = Depends(get_db),
     admin: dict = Depends(get_current_admin)  # Protected: requires auth
 ):
     users = UserService.get_users(db=db, skip=skip, limit=limit)
     return users
+
+
+@router.put("/index/{index_number}", response_model=UserResponse)
+def update_student_by_index(
+    index_number: str,
+    student_update: StudentRegister,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_current_admin)  # Protected: requires auth
+):
+    """Update student details by index number"""
+    db_user = db.query(User).filter(User.index_number == index_number).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail=f"User with index number {index_number} not found")
+    
+    # Check if new email or index number conflicts with existing users (excluding current user)
+    if student_update.email != db_user.email:
+        existing_email = db.query(User).filter(
+            User.email == student_update.email,
+            User.id != db_user.id
+        ).first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already exists for another user")
+    
+    if student_update.index_number != db_user.index_number:
+        existing_index = db.query(User).filter(
+            User.index_number == student_update.index_number,
+            User.id != db_user.id
+        ).first()
+        if existing_index:
+            raise HTTPException(status_code=400, detail="Index number already exists for another user")
+    
+    # Update fields
+    db_user.name = student_update.name
+    db_user.index_number = student_update.index_number
+    db_user.email = student_update.email
+    db_user.mobile_number = student_update.mobile_number
+    db_user.combination = student_update.combination
+    
+    db.commit()
+    db.refresh(db_user)
+    return db_user
