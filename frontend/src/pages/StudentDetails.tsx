@@ -166,7 +166,7 @@ function StudentDetails() {
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#c5a059]/20 border border-[#c5a059]/50 rounded-lg text-[#3e2723] hover:bg-[#c5a059]/30 transition-colors font-display text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#800020] border-2 border-[#800020] rounded-lg text-[#f5f0e1] hover:bg-[#9a0026] hover:border-[#9a0026] transition-colors font-display text-sm shadow-md"
             >
               <span>✎</span> Edit Details
             </button>
@@ -174,14 +174,14 @@ function StudentDetails() {
             <div className="flex gap-2">
               <button
                 onClick={handleCancel}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 border border-gray-400 rounded-lg text-gray-700 hover:bg-gray-300 transition-colors font-display text-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#5a4a42] border-2 border-[#5a4a42] rounded-lg text-[#f5f0e1] hover:bg-[#6a5a52] hover:border-[#6a5a52] transition-colors font-display text-sm shadow-md"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 border border-green-700 rounded-lg text-white hover:bg-green-700 transition-colors font-display text-sm disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#2d5016] border-2 border-[#2d5016] rounded-lg text-[#f5f0e1] hover:bg-[#3d6020] hover:border-[#3d6020] transition-colors font-display text-sm shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? "Saving..." : "✓ Save Changes"}
               </button>
